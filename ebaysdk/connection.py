@@ -13,6 +13,7 @@ import time
 import uuid
 import webbrowser
 
+import requests
 from requests import Request, Session
 from requests.adapters import HTTPAdapter
 
@@ -117,7 +118,7 @@ class BaseConnection(object):
             self._list_nodes += self.base_list_nodes
 
         self.build_request(verb, data, verb_attrs, files)
-        self.execute_request()        
+        self.execute_request(verb, data, verb_attrs, files)        
 
         if hasattr(self.response, 'content'):
             self.process_response()
@@ -166,7 +167,7 @@ class BaseConnection(object):
         )
         return url
 
-    def execute_request(self):
+    def execute_request(self, verb=None, data=None, verb_attrs=None, files=None):
 
         log.debug("REQUEST (%s): %s %s" \
             % (self._request_id, self.request.method, self.request.url))
@@ -177,12 +178,16 @@ class BaseConnection(object):
             self.parallel._add_request(self)
             return None
 
-        self.response = self.session.send(self.request,
-            verify=True,
-            proxies=self.proxies,
-            timeout=self.timeout,
-            allow_redirects=True
-        )
+        if verb == "findItemsbyCategory":
+            params = self.build_request_params(verb, verb_attrs["category_id"], verb_attrs["entries_per_page"])
+            self.response = requests.get("https://svcs.ebay.com/services/search/FindingService/v1", params=params, verify=False)
+        else:
+            self.response = self.session.send(self.request,
+                verify=False,
+                proxies=self.proxies,
+                timeout=self.timeout,
+                allow_redirects=True
+            )
 
         log.debug('RESPONSE (%s):' % self._request_id)
         log.debug('elapsed time=%s' % self.response.elapsed)

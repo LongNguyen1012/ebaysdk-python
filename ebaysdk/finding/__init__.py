@@ -186,6 +186,18 @@ class Connection(BaseConnection):
             "Content-Type": "text/xml"
         }
 
+    def build_request_params(self, verb, category_id, entries_per_page):
+        return {
+            "OPERATION-NAME": "findItemsByCategory",
+            "SERVICE-VERSION": "1.0.0",
+            "SECURITY-APPNAME": self.config.get('appid', ''),
+            "RESPONSE-DATA-FORMAT": "XML",
+            "REST-PAYLOAD": "",
+            "categoryId": category_id,
+            "paginationInput.entriesPerPage": entries_per_page    
+        }
+
+
     def build_request_data(self, verb, data, verb_attrs):
         xml = "<?xml version='1.0' encoding='utf-8'?>"
         xml += "<" + verb + "Request xmlns=\"http://www.ebay.com/marketplace/search/v1/services\">"

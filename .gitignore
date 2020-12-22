@@ -7,3 +7,5 @@ ebaysdk.egg-info/
 *.pyc
 .svn
 .idea
+/ebay_env/
+ebay.yaml
